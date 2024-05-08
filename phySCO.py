@@ -33,15 +33,6 @@ import subprocess, argparse, sys, os, glob, math
 from argparse import RawTextHelpFormatter
 
 
-# HOW MANY GENES DO YOU WANT TO KEEP FOR YOUR PHYLOGENETIC ANALYSIS?
-# UNCOMMENT and EDIT HERE if you don't want to run phySCO on all of your genes, but just on a subset.
-# This will speed up the analysis.
-# We suggest to keep all the genes that phySCO can find, particularly when BUSCO scores are not so good.
-# If you want to keep all of your genes, just leave the following line as it is.
-#
-# genes_to_keep = 10
-
-
 ############################
 #     Define functions     #
 ############################
@@ -118,6 +109,10 @@ parser.add_argument("-t", "--occupancy_threshold",
                     help = "Range: 0-1. The minimum percentage of species required to keep a gene. E.g., if this argument is set to 0.8, all the genes that are present in less than the 80%% of species will be discarded from the phylogenetic analysis. (Default = 0.85)",
                     default = 0.85)
 
+parser.add_argument("-g", "--genes_to_keep",
+                    type = int,
+                    help = "The number of genes you want to use to infer the phylogenetic tree. E.g., if you want to speed up the phylogenetic analysis, you can use just 10 genes. Do not include this flag if you want to use all the available genes.")
+
 # This line checks if the user gave no arguments, and if so then print the help
 parser.parse_args(args = None if sys.argv[1:] else ["--help"])
 
@@ -153,7 +148,11 @@ speciesID_list = [os.path.basename(i).split("_")[0] for i in os.listdir(INPUT_DI
 print(f"{len(speciesID_list)} species identifier found in {INPUT_DIR}/:")
 print("    " + ", ".join(speciesID_list) + ".")
 print(f"    {int(math.ceil(len(speciesID_list)*args.occupancy_threshold))} is the minimum number of species to keep a gene for downstream analysis\n"
-      f"(occupancy threshold: {int(args.occupancy_threshold*100)}%).")
+      f"    (occupancy threshold: {int(args.occupancy_threshold*100)}%).")
+if args.genes_to_keep is not None:
+    print(f"    {args.genes_to_keep} is the number of genes that will be used for downstream analyses.")
+else:
+    print(f"    All the available genes will be used for downstream analyses.")
 print()
 
 # Get the list of all the complete BUSCO genes found in the input species
@@ -223,7 +222,8 @@ for gene in gene_list:
         else:
             continue
         
-    if 'genes_to_keep' in globals() and kept_genes == genes_to_keep:
+    # if a maximum number of genes to use has been set, check whether to break the cycle or not
+    if args.genes_to_keep is not None and kept_genes == args.genes_to_keep:
         break
             
 print(f"    {discarded_genes} genes were discarded because didn't meet the occupancy threshold ({args.occupancy_threshold}).")
