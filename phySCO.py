@@ -1,32 +1,35 @@
 #!/bin/env python3
 
+"""
 #### **phySCO** is a python script to infer maximum likelihood _phy_logenomic tree using BUSCO _s_ingle-_c_opy _o_rthologous genes. ####
-#
-# General description: given a directory containing busco results for a group of species, this script computes the maximum likelihood phylogenetic tree of all the species.
-# This script is currently able to process just AMINO ACID SEQUENCES of complete single-copy BUSCO genes.
-# In fact, amino acids sequences are always returned by any BUSCO analysis run mode (either genome, transcriptome or protein).
-#
-# REQUIRED SOFTWARES: mafft, trimal, IQTREE2
-#
-# To run this script, just copy the BUSCO output folders for each species with their default structure into a dedicated directory.
-# Then, make sure that each species folder specifies a unique identifier, which should be placed at the beginning of the name followed by an underscore.
-# Here you can find an example of input directory: 
-# input_dir/
-# ├── uniqueID1_whateveryouWant/
-# |   └── {busco default outputs for species uniqueID1}
-# ├── uniqueID2_whateveryouWant/
-# |   └── {busco default outputs for species uniqueID2}
-# ├── uniqueID3_whateveryouWant/
-# |   └── {busco default outputs for species uniqueID3}
-# ...
-# └── uniqueIDN_whateveryouWant/
-#     └── {busco default outputs for species uniqueIDN}
-#
-# Written by: Filippo Nicolini
-# Last update: 08/05/2024
-#
-# Aknowledgements. Many thanks to Niccolò Righetti (https://github.com/NiccoloRighetti), whose work has pushed me to write this code.
-#
+
+General description: given a directory containing busco results for a group of species, this script computes the maximum likelihood phylogenetic tree of all the species.
+This script is currently able to process just AMINO ACID SEQUENCES of complete single-copy BUSCO genes.
+In fact, amino acids sequences are always returned by any BUSCO analysis run mode (either genome, transcriptome or protein).
+
+REQUIRED SOFTWARES: mafft, trimal, IQTREE2
+
+To run this script, just copy the BUSCO output folders for each species with their default structure into a dedicated directory.
+Then, make sure that each species folder specifies a unique identifier, which should be placed at the beginning of the name followed by an underscore.
+Here you can find an example of input directory: 
+input_dir/
+├── uniqueID1_whateveryouWant/
+|   └── {busco default outputs for species uniqueID1}
+├── uniqueID2_whateveryouWant/
+|   └── {busco default outputs for species uniqueID2}
+├── uniqueID3_whateveryouWant/
+|   └── {busco default outputs for species uniqueID3}
+...
+└── uniqueIDN_whateveryouWant/
+    └── {busco default outputs for species uniqueIDN}
+
+Written by: Filippo Nicolini
+Last update: 08/05/2024
+
+Aknowledgements. Many thanks to Niccolò Righetti (https://github.com/NiccoloRighetti), whose work has pushed me to write this code.
+
+"""
+
 #-------------------------------------------------------------------------------
 
 import subprocess, argparse, sys, os, glob, math
