@@ -294,10 +294,10 @@ print("Done")
 #     Infer ML phylogenetic tree out of trimmed alignments     #
 ################################################################
 
-if args.merge_partitions:
+if args.merge_partitions == False:
     print()
     print("Inferring ML phylogenetic tree with IQ-TREE...\n"
-          "    Partition merging is enabled."
+          "    Partition merging is enabled.\n"
           "    This may take a while...")
 
     try:
@@ -313,7 +313,7 @@ if args.merge_partitions:
 else:
     print()
     print("Inferring ML phylogenetic tree with IQ-TREE...\n"
-          "    Partition merging is disabled."
+          "    Partition merging is disabled.\n"
           "    This may take a while...")
 
     try:
