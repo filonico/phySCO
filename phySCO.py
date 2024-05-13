@@ -294,17 +294,12 @@ print("Done")
 #     Infer ML phylogenetic tree out of trimmed alignments     #
 ################################################################
 
-print()
-print("Inferring ML phylogenetic tree with IQ-TREE...\n"
-      "    This may take a while...")
-
-# # Create a directory to store trimmed alignments
-# trim_dir = f"{args.output_dir}/fasta_files_aligned_trimmed"
-# create_new_directory(trim_dir)
-
-# alignments_file_list = os.listdir(alignments_dir)
-
 if args.merge_partitions:
+    print()
+    print("Inferring ML phylogenetic tree with IQ-TREE...\n"
+          "    Partition merging is enabled."
+          "    This may take a while...")
+
     try:
         iqtree_process = subprocess.run(f"iqtree2 -p {trim_dir} -m MFP --merge --rcluster-max 25 -nstop 500 -T AUTO -bb 1000 --runs 3 --prefix {args.output_dir}/MLtree",
                                         shell = True,
@@ -316,6 +311,11 @@ if args.merge_partitions:
     except subprocess.CalledProcessError as err:
         print("An error occured:", err)
 else:
+    print()
+    print("Inferring ML phylogenetic tree with IQ-TREE...\n"
+          "    Partition merging is disabled."
+          "    This may take a while...")
+
     try:
         iqtree_process = subprocess.run(f"iqtree2 -p {trim_dir} -m MFP -nstop 500 -T AUTO -bb 1000 --runs 3 --prefix {args.output_dir}/MLtree",
                                         shell = True,
