@@ -116,6 +116,10 @@ parser.add_argument("-g", "--genes_to_keep",
                     type = int,
                     help = "The number of genes you want to use to infer the phylogenetic tree. E.g., if you want to speed up the phylogenetic analysis, you can use just 10 genes. Do not include this flag if you want to use all the available genes.")
 
+parser.add_argument("-m", "--merge_partitions",
+                    action = "store_false",
+                    help = "If used, this flag enables partition merging of IQTREE (--merge --rcluster-max 25). (Default = False)")
+
 # This line checks if the user gave no arguments, and if so then print the help
 parser.parse_args(args = None if sys.argv[1:] else ["--help"])
 
@@ -300,25 +304,28 @@ print("Inferring ML phylogenetic tree with IQ-TREE...\n"
 
 # alignments_file_list = os.listdir(alignments_dir)
 
-try:
-    iqtree_process = subprocess.run(f"iqtree2 -p {trim_dir} -m MFP --merge --rcluster-max 25 -nstop 500 -T AUTO -bb 1000 --runs 3 --prefix {args.output_dir}/MLtree",
-                                    shell = True,
-                                    capture_output = True,
-                                    text = True)
-    
-    iqtree_process.check_returncode()
+if args.merge_partitions:
+    try:
+        iqtree_process = subprocess.run(f"iqtree2 -p {trim_dir} -m MFP --merge --rcluster-max 25 -nstop 500 -T AUTO -bb 1000 --runs 3 --prefix {args.output_dir}/MLtree",
+                                        shell = True,
+                                        capture_output = True,
+                                        text = True)
+        
+        iqtree_process.check_returncode()
 
-    # stdout = iqtree_process.communicate()
-    # stdout = stdout.split("\n")
-    # for line in stdout:
-    #     if "alignment files in directory" in line or \
-    #         "Measuring multi-threading efficiency" in line or \
-    #         "Selecting individual models for" in line or \
-    #         "Merging models to increase model" in line or \
-    #         "START RUN NUMBER" in line:
-    #         print(f"    {line}...")
+    except subprocess.CalledProcessError as err:
+        print("An error occured:", err)
+else:
+    try:
+        iqtree_process = subprocess.run(f"iqtree2 -p {trim_dir} -m MFP -nstop 500 -T AUTO -bb 1000 --runs 3 --prefix {args.output_dir}/MLtree",
+                                        shell = True,
+                                        capture_output = True,
+                                        text = True)
+        
+        iqtree_process.check_returncode()
 
-except subprocess.CalledProcessError as err:
-    print("An error occured:", err)
+    except subprocess.CalledProcessError as err:
+        print("An error occured:", err)
+
 
 print("Done")
