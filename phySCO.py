@@ -94,7 +94,7 @@ def trim_alignments(input_fasta, output_fasta):
 
 # Initialise the parser class
 parser = argparse.ArgumentParser(description = "### WELCOME TO phySCO - *phy*logenetic trees from busco *s*ingle-*c*opy *o*rthologous genes ###\n"
-                                 "This script computes the Maximum Likelihood phylogenetic tree of a group of species, using BUSCO complete single-copy genes. "
+                                 "This script computes the Maximum Likelihood phylogenetic tree of a group of species, using BUSCO complete single-copy genes.\n"
                                  "BUSCO is supposed to have been already run.",
                                  formatter_class = RawTextHelpFormatter)
 
@@ -109,19 +109,27 @@ parser.add_argument("-o", "--output_dir",
 
 parser.add_argument("-t", "--occupancy_threshold",
                     type = range_limited_float_type,
-                    help = "Range: 0-1. The minimum percentage of species required to keep a gene. E.g., if this argument is set to 0.8, all the genes that are present in less than the 80%% of species will be discarded from the phylogenetic analysis. (Default = 0.85)",
+                    help = "Range: 0-1. The minimum percentage of species required to keep a\n"
+                           "gene. E.g., if this argument is set to 0.8, all the genes that are\n"
+                           "present in less than the 80%% of species will be discarded from\n"
+                           "the phylogenetic analysis. (Default = 0.85)",
                     default = 0.85)
 
 parser.add_argument("-g", "--genes_to_keep",
                     type = int,
-                    help = "The number of genes you want to use to infer the phylogenetic tree. E.g., if you want to speed up the phylogenetic analysis, you can use just 10 genes. Do not include this flag if you want to use all the available genes.")
+                    help = "The number of genes you want to use to infer the phylogenetic tree.\n"
+                           "E.g., if you want to speed up the phylogenetic analysis, you can\n"
+                           "use just 10 genes. Do not include this flag if you want to use all\n"
+                           "the available genes.")
 
 parser.add_argument("-m", "--merge_partitions",
                     action = "store_false",
-                    help = "If used, this flag enables partition merging of IQTREE (--merge --rcluster-max 25). (Default = False)")
+                    help = "If used, this flag enables partition merging of IQTREE\n"
+                           "(--merge --rcluster-max 25). (Default = False)")
 
 parser.add_argument("-s", "--sequence_type",
-                    help = "Choose the type of fasta file to process, i.e., amino acids (AA) or nucleotides (NT). (Default = AA)",
+                    help = "Choose the type of fasta file to process, i.e., amino acids (AA)\n"
+                           "or nucleotides (NT). (Default = AA)",
                     choices = ["AA","NT"],
                     default = "AA")
 
