@@ -14,7 +14,7 @@ Given a directory containing BUSCO results for a group of species, phySCO comput
 To run phySCO, just create a dedicated directory and copy into it BUSCO results for the species you want to analyse.
 > **Mind to keep the default structure of BUSCO results**.
 
-phySCO is currently able to process **just amino acid sequences** of complete single-copy BUSCO genes. In fact, amino acids sequences are always returned by any BUSCO analysis run mode (either genome, transcriptome or protein). Maybe, in the future, phySCO will be able to process also nucleotide sequences...
+phySCO is able to process **both amino acid and nucleotide sequences** of complete single-copy BUSCO genes. Nonetheless, its default behaviour is to work with amino acid sequences, as they are *always* returned by any BUSCO analysis run mode (either genome, transcriptome or protein).
 
 ## Required softwares and dependencies
 Here is the list of software that phySCO requires:

@@ -120,6 +120,11 @@ parser.add_argument("-m", "--merge_partitions",
                     action = "store_false",
                     help = "If used, this flag enables partition merging of IQTREE (--merge --rcluster-max 25). (Default = False)")
 
+parser.add_argument("-s", "--sequence_type",
+                    help = "Choose the type of fasta file to process, i.e., amino acids (AA) or nucleotides (NT). (Default = AA)",
+                    choices = ["AA","NT"],
+                    default = "AA")
+
 # This line checks if the user gave no arguments, and if so then print the help
 parser.parse_args(args = None if sys.argv[1:] else ["--help"])
 
@@ -157,7 +162,7 @@ print("    " + ", ".join(speciesID_list) + ".")
 print(f"    {int(math.ceil(len(speciesID_list)*args.occupancy_threshold))} is the minimum number of species to keep a gene for downstream analysis\n"
       f"    (occupancy threshold: {int(args.occupancy_threshold*100)}%).")
 if args.genes_to_keep is not None:
-    print(f"    {args.genes_to_keep} is the number of genes that will be used for downstream analyses.")
+    print(f"    {args.genes_to_keep} genes will be used for downstream analyses.")
 else:
     print(f"    All the available genes will be used for downstream analyses.")
 print()
@@ -184,7 +189,6 @@ with open(gene_file) as input_list:
         gene_list.append(line.strip())
 
 print(f"    {len(gene_list)} unique BUSCO gene identifiers found.")
-print()
 
 # Create a directory to store fasta files
 fasta_dir = f"{args.output_dir}/fasta_files"
@@ -194,18 +198,53 @@ create_new_directory(fasta_dir)
 discarded_genes = 0
 kept_genes = 0
 
+# Check if fasta files exist
+if args.sequence_type == "NT":
+    if not glob.glob(f"{INPUT_DIR}/*/run*/busco_sequences/single_copy_busco_sequences/*.fna"):
+        print()
+        print(f"### Mmh, you selected the {args.sequence_type} fasta type (*.fna), but no such file has been found. ###\n"
+              f"### You may want to check your input directory ({INPUT_DIR}/). ###\n"
+              "Quitting the analysis...")
+        print()
+    
+        quit()
+    else:
+        print(f"    The analyses will be performed on nucleotide sequences!")
+        print()
+
+elif args.sequence_type == "AA":
+    if not f"{INPUT_DIR}/*/run*/busco_sequences/single_copy_busco_sequences/*.faa":
+        print()
+        print(f"### Mmh, you selected the {args.sequence_type} fasta type (*.faa), but no such file has been found. ###\n"
+              f"### You may want to check your input directory ({INPUT_DIR}/). ###\n"
+              "Quitting the analysis...")
+        print()
+
+        quit()
+        
+    else:
+        print(f"    The analyses will be performed on amino acid sequences!")
+        print()
+
+
 # Generate separate fasta files with genes from species meeting inclusion threshold
 print(f"Generating fasta files for each gene with all the annotated species...")
 for gene in gene_list:
-    # Get the list of each genes in each species
-    gene_file_list = glob.glob(f"{INPUT_DIR}/*/run*/busco_sequences/single_copy_busco_sequences/{gene}.faa")
+
+    if args.sequence_type == "NT":
+        # Get the list of each genes in each species (nucleotides)
+        gene_file_list = glob.glob(f"{INPUT_DIR}/*/run*/busco_sequences/single_copy_busco_sequences/{gene}.fna")
+
+    elif args.sequence_type == "AA":
+        # Get the list of each genes in each species (amino acids)
+        gene_file_list = glob.glob(f"{INPUT_DIR}/*/run*/busco_sequences/single_copy_busco_sequences/{gene}.faa")
 
     # Get the occupancy thershold for each gene
     occupancy = len(gene_file_list)/len(os.listdir(INPUT_DIR))
 
     # print(f"{gene=} {occupancy=} {args.occupancy_threshold=}")
 
-    # Check if occupancy requirements are met, otherwise do not continue with the analysis
+    # Check if occupancy requirements are met, in which case do not continue with the analysis
     if float(occupancy) < float(args.occupancy_threshold):
         discarded_genes += 1
         continue
@@ -214,8 +253,12 @@ for gene in gene_list:
 
     # For each gene in each species, change the header to include just the unique species identifier
     for id in speciesID_list:
-        input_fasta = glob.glob(f"{INPUT_DIR}/{id}*/run*/busco_sequences/single_copy_busco_sequences/{gene}.faa")
-        output_fasta = f"{args.output_dir}/fasta_files/{gene}.faa"
+        if args.sequence_type == "NT":
+            input_fasta = glob.glob(f"{INPUT_DIR}/{id}*/run*/busco_sequences/single_copy_busco_sequences/{gene}.fna")
+            output_fasta = f"{args.output_dir}/fasta_files/{gene}.fna"
+        elif args.sequence_type == "AA":
+            input_fasta = glob.glob(f"{INPUT_DIR}/{id}*/run*/busco_sequences/single_copy_busco_sequences/{gene}.faa")
+            output_fasta = f"{args.output_dir}/fasta_files/{gene}.faa"
 
         if input_fasta:
             # Progressively add sequences to each fasta file
@@ -232,8 +275,12 @@ for gene in gene_list:
     # if a maximum number of genes to use has been set, check whether to break the cycle or not
     if args.genes_to_keep is not None and kept_genes == args.genes_to_keep:
         break
-            
-print(f"    {discarded_genes} genes were discarded because didn't meet the occupancy threshold ({args.occupancy_threshold}).")
+
+if discarded_genes == 1:
+    print(f"    {discarded_genes} gene was discarded because didn't meet the occupancy threshold ({args.occupancy_threshold}).")
+else:
+    print(f"    {discarded_genes} genes were discarded because didn't meet the occupancy threshold ({args.occupancy_threshold}).")
+
 print(f"    {kept_genes} genes were kept for downstream phylogenomic analysis.")
 print("Done")
 
@@ -256,7 +303,11 @@ print(f"    {len(fasta_file_list)} fasta files found in {fasta_dir}/...")
 # Align fasta files with mafft (auto mode)
 for file in fasta_file_list:
     INPUT_FASTA = fasta_dir + "/" + file
-    OUTPUT_FASTA = alignments_dir + "/" + file.replace(".faa","_aligned.faa")
+    if args.sequence_type == "NT":
+        OUTPUT_FASTA = alignments_dir + "/" + file.replace(".fna","_aligned.fna")
+    elif args.sequence_type == "AA":
+        OUTPUT_FASTA = alignments_dir + "/" + file.replace(".faa","_aligned.faa")
+
     # print(f"{INPUT_FASTA=} {OUTPUT_FASTA=}")
 
     align_fasta(INPUT_FASTA, OUTPUT_FASTA)
@@ -282,7 +333,10 @@ print(f"    {len(alignments_file_list)} alignment files found in {alignments_dir
 # Trim alignments with trimAl (automated1 mode)
 for file in alignments_file_list:
     INPUT_FASTA = alignments_dir + "/" + file
-    OUTPUT_FASTA = trim_dir + "/" + file.replace(".faa","_trim.faa")
+    if args.sequence_type == "NT":
+        OUTPUT_FASTA = trim_dir + "/" + file.replace(".fna","_trim.fna")
+    elif args.sequence_type == "AA":
+        OUTPUT_FASTA = trim_dir + "/" + file.replace(".faa","_trim.faa")
     # print(f"{INPUT_FASTA=} {OUTPUT_FASTA=}")
 
     trim_alignments(INPUT_FASTA, OUTPUT_FASTA)
