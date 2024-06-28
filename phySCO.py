@@ -167,7 +167,7 @@ else:
 speciesID_list = [os.path.basename(i).split("_")[0] for i in os.listdir(INPUT_DIR)]
 print(f"{len(speciesID_list)} species identifier found in {INPUT_DIR}/:")
 print("    " + ", ".join(speciesID_list) + ".")
-print(f"    {int(math.ceil(len(speciesID_list)*args.occupancy_threshold))} is the minimum number of species to keep a gene for downstream analysis\n"
+print(f"    {int(round(len(speciesID_list)*args.occupancy_threshold))} is the minimum number of species to keep a gene for downstream analysis\n"
       f"    (occupancy threshold: {int(args.occupancy_threshold*100)}%).")
 if args.genes_to_keep is not None:
     print(f"    {args.genes_to_keep} genes will be used for downstream analyses.")
@@ -253,7 +253,7 @@ for gene in gene_list:
     # print(f"{gene=} {occupancy=} {args.occupancy_threshold=}")
 
     # Check if occupancy requirements are met, in which case do not continue with the analysis
-    if float(occupancy) < float(args.occupancy_threshold):
+    if float(occupancy) <= float(args.occupancy_threshold):
         discarded_genes += 1
         continue
     else:
