@@ -253,7 +253,7 @@ for gene in gene_list:
     # print(f"{gene=} {occupancy=} {args.occupancy_threshold=}")
 
     # Check if occupancy requirements are met, in which case do not continue with the analysis
-    if float(occupancy) <= float(args.occupancy_threshold):
+    if float(occupancy) < float(args.occupancy_threshold):
         discarded_genes += 1
         continue
     else:
