@@ -119,7 +119,7 @@ parser.add_argument("-g", "--genes_to_keep",
                     type = int,
                     help = "The number of genes you want to use to infer the phylogenetic tree.\n"
                            "E.g., if you want to speed up the phylogenetic analysis, you can\n"
-                           "use just 10 genes. Do not include this flag if you want to use all\n"
+                           "use just 10 random genes. Do not include this flag if you want to use all\n"
                            "the available genes.")
 
 parser.add_argument("-m", "--merge_partitions",
@@ -182,7 +182,7 @@ print("Retrieving the list of all the complete BUSCO genes found in the input sp
 try:
     awk_process = subprocess.run(f"cat {INPUT_DIR}/*/run*/full_table.tsv | "
                                  "awk -F \"\t\" '{if ($2 == \"Complete\") print $1}' | "
-                                 f"sort -u > {gene_file}",
+                                 f"shuf > {gene_file}",
                                  shell = True)
     
     awk_process.check_returncode()
