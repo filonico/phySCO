@@ -24,7 +24,7 @@ input_dir/
     └── {busco default outputs for species uniqueIDN}
 
 Written by: Filippo Nicolini
-Last update: 08/05/2024
+Last update: 26/11/2024
 
 Aknowledgements. Many thanks to Niccolò Righetti (https://github.com/NiccoloRighetti), whose work has pushed me to write this code.
 
