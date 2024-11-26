@@ -182,6 +182,7 @@ print("Retrieving the list of all the complete BUSCO genes found in the input sp
 try:
     awk_process = subprocess.run(f"cat {INPUT_DIR}/*/run*/full_table.tsv | "
                                  "awk -F \"\t\" '{if ($2 == \"Complete\") print $1}' | "
+                                 "sort -u | "
                                  f"shuf > {gene_file}",
                                  shell = True)
     
